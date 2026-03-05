@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namugambe & family Property · Keyholder</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar-transition {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        /* Loading animation */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #FFD100; /* Jamaican yellow */
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu-enter {
+            transform: translateX(-100%);
+        }
+        
+        .mobile-menu-enter-active {
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        /* ===== NEW: House rental background for login ===== */
+        .house-rental-bg {
+            background-image: url('https://images.unsplash.com/photo-1582268611958-eb7e97926d4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        /* soft overlay so white card stands out */
+        .house-rental-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3); /* darken slightly */
+            backdrop-filter: blur(3px);
+            z-index: 0;
+        }
+        /* ensure content above overlay */
+        .house-rental-bg > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Jamaican accent colours (kept for dashboard and accents) */
+        .bg-jamaica-green { background-color: #009B3A; }
+        .bg-jamaica-yellow { background-color: #FFD100; }
+        .bg-jamaica-black { background-color: #231F20; }
+        .text-jamaica-green { color: #009B3A; }
+        .text-jamaica-yellow { color: #FFD100; }
+        .border-jamaica-green { border-color: #009B3A; }
+        
+        /* body background for dashboard (soft jamaican gradient) */
+        .body-jamaica {
+            background: linear-gradient(145deg, #f0f7e8 0%, #fef9e0 100%);
+        }
+    </style>
+</head>
+<body class="body-jamaica min-h-screen">
+
+<!-- Login Page with house rental background and keyholder logo -->
+<div id="loginPage" class="house-rental-bg min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-sm p-8 rounded-xl shadow-2xl w-full max-w-md border-4 border-jamaica-green">
+        <div class="text-center mb-8">
+            <!-- ===== REPLACED flag with KEY icon ===== keyholder logo -->
+            <div class="w-24 h-24 mx-auto bg-jamaica-green rounded-full flex items-center justify-center text-white text-4xl font-bold border-4 border-jamaica-yellow">
+                <i class="fas fa-key"></i>
+            </div>
+            <h2 class="mt-4 text-3xl font-bold text-jamaica-green">Namugambe & Family</h2>
+            <p class="text-jamaica-black font-medium">Property Management · Keyholder</p>
+        </div>
+        
+        <!-- Login Tabs -->
+        <div class="flex border-b border-gray-300 mb-6">
+            <button onclick="showLogin('admin')" id="adminTabBtn" class="flex-1 py-2 px-4 text-center border-b-2 border-jamaica-green font-medium text-jamaica-green">Admin</button>
+            <button onclick="showLogin('tenant')" id="tenantTabBtn" class="flex-1 py-2 px-4 text-center border-b-2 border-transparent font-medium text-gray-600 hover:text-jamaica-green">Tenant</button>
+            <button onclick="showLogin('nextofkin')" id="nextofkinTabBtn" class="flex-1 py-2 px-4 text-center border-b-2 border-transparent font-medium text-gray-600 hover:text-jamaica-green">Next of Kin</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                    <i class="fas fa-envelope mr-2 text-jamaica-green"></i>Email
+                </label>
+                <input type="email" id="email" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green"
+                    placeholder="Enter your email">
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    <i class="fas fa-lock mr-2 text-jamaica-green"></i>Password
+                </label>
+                <input type="password" id="password" required 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green"
+                    placeholder="Enter your password">
+            </div>
+            
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" class="h-4 w-4 text-jamaica-green focus:ring-jamaica-green border-gray-300 rounded">
+                    <label for="remember" class="ml-2 block text-sm text-gray-900">Remember me</label>
+                </div>
+                
+                <a href="#" class="text-sm text-jamaica-green hover:text-jamaica-green/80">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="w-full bg-jamaica-green text-white py-2 px-4 rounded-lg hover:bg-jamaica-green/80 transition duration-200 font-semibold">
+                <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+            </button>
+            
+            <!-- Follow Us (kept, but small keyholder icon added subtly) -->
+            <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-jamaica-yellow">
+                <p class="text-xs text-jamaica-black font-semibold mb-2 flex items-center">
+                    <i class="fas fa-key text-jamaica-green mr-1"></i> 🇯🇲 Follow Us:
+                </p>
+                <div class="text-xs space-y-2 text-gray-700">
+                    <div class="flex items-center">
+                        <i class="fab fa-whatsapp text-jamaica-green w-5 mr-2"></i>
+                        <span>0704123532</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-phone text-jamaica-green w-5 mr-2"></i>
+                        <span>+256750905841, +256780873601</span>
+                    </div>
+                    <div class="flex items-center space-x-4 mt-1 pt-1">
+                        <span class="flex items-center"><i class="fab fa-twitter text-jamaica-green mr-1"></i> X</span>
+                        <span class="flex items-center"><i class="fab fa-tiktok text-jamaica-green mr-1"></i> TikTok</span>
+                        <span class="flex items-center"><i class="fab fa-instagram text-jamaica-green mr-1"></i> Instagram</span>
+                    </div>
+                </div>
+                <!-- small note: login with any email/password (no demo credentials shown) -->
+                <p class="text-[10px] text-gray-400 mt-2 italic">use any email/password to test</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Main Dashboard (unchanged apart from jamaican vibe) -->
+<div id="dashboardPage" class="hidden min-h-screen body-jamaica">
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="fixed inset-0 bg-jamaica-black bg-opacity-50 hidden z-20" onclick="toggleMobileMenu()"></div>
+    
+    <!-- Sidebar with jamaican flair -->
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-30 border-r-4 border-jamaica-green">
+        <div class="flex items-center justify-center h-16 bg-jamaica-green">
+            <i class="fas fa-building text-jamaica-yellow text-2xl mr-2"></i>
+            <span class="text-white font-bold text-lg">Namugambe 🇯🇲</span>
+        </div>
+        
+        <nav class="mt-8">
+            <div class="px-4 mb-4">
+                <div class="flex items-center space-x-3 p-3 bg-yellow-100 rounded-lg border border-jamaica-yellow">
+                    <div class="w-10 h-10 bg-jamaica-green rounded-full flex items-center justify-center text-jamaica-yellow font-bold" id="userInitials">
+                        JD
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate" id="userName">John Doe</p>
+                        <p class="text-xs text-gray-500 truncate" id="userRole">Admin</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-4 space-y-1" id="sidebarLinks">
+                <!-- Links will be populated by JavaScript -->
+            </div>
+        </nav>
+        
+        <div class="absolute bottom-0 w-full p-4 border-t border-jamaica-green">
+            <button onclick="handleLogout()" class="flex items-center w-full px-4 py-2 text-gray-600 hover:bg-jamaica-green/10 rounded-lg transition duration-200">
+                <i class="fas fa-sign-out-alt mr-3 text-jamaica-green"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="lg:ml-64">
+        <!-- Top Navigation with jamaican colours -->
+        <nav class="bg-white/90 backdrop-blur-sm shadow-md border-b-2 border-jamaica-yellow">
+            <div class="px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <button onclick="toggleMobileMenu()" class="lg:hidden text-jamaica-green hover:text-jamaica-green/70">
+                            <i class="fas fa-bars text-2xl"></i>
+                        </button>
+                        <h1 class="ml-4 lg:ml-0 text-xl font-semibold text-jamaica-green" id="pageTitle">Dashboard</h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Notifications -->
+                        <button class="relative text-jamaica-green hover:text-jamaica-green/70">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 h-4 w-4 bg-jamaica-green rounded-full text-xs text-white flex items-center justify-center">3</span>
+                        </button>
+                        
+                        <!-- Messages -->
+                        <button class="relative text-jamaica-green hover:text-jamaica-green/70">
+                            <i class="fas fa-envelope text-xl"></i>
+                            <span class="absolute -top-1 -right-1 h-4 w-4 bg-jamaica-yellow rounded-full text-xs text-jamaica-black flex items-center justify-center">5</span>
+                        </button>
+                        
+                        <!-- Profile Dropdown -->
+                        <div class="relative" id="profileDropdown">
+                            <button onclick="toggleProfileDropdown()" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                                <img src="https://ui-avatars.com/api/?name=John+Doe&background=009B3A&color=FFD100" alt="Profile" class="h-8 w-8 rounded-full border-2 border-jamaica-yellow">
+                                <span class="hidden md:block" id="profileName">John Doe</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            
+                            <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 hidden border border-jamaica-green">
+                                <a href="#" onclick="showPage('profile')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-jamaica-green/10">
+                                    <i class="fas fa-user mr-2 text-jamaica-green"></i>Profile
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-jamaica-green/10">
+                                    <i class="fas fa-cog mr-2 text-jamaica-green"></i>Settings
+                                </a>
+                                <hr class="my-1">
+                                <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Page Content -->
+        <main class="py-6 px-4 sm:px-6 lg:px-8" id="pageContent">
+            <!-- Dynamic content will be loaded here -->
+        </main>
+    </div>
+</div>
+
+<script>
+    // State Management
+    let currentUser = null;
+    let currentPage = 'dashboard';
+    let userRole = 'admin';
+    
+    // Navigation Links based on role
+    const navLinks = {
+        admin: [
+            { name: 'Dashboard', icon: 'fa-chart-pie', page: 'dashboard' },
+            { name: 'Rent Management', icon: 'fa-money-bill-wave', page: 'rent' },
+            { name: 'Electricity Bills', icon: 'fa-bolt', page: 'electricity' },
+            { name: 'Tenants', icon: 'fa-users', page: 'tenants' },
+            { name: 'Properties', icon: 'fa-building', page: 'properties' },
+            { name: 'Messages', icon: 'fa-comments', page: 'messages' },
+            { name: 'Reports', icon: 'fa-chart-bar', page: 'reports' }
+        ],
+        tenant: [
+            { name: 'Dashboard', icon: 'fa-chart-pie', page: 'dashboard' },
+            { name: 'My Rent', icon: 'fa-money-bill-wave', page: 'my-rent' },
+            { name: 'My Bills', icon: 'fa-bolt', page: 'my-bills' },
+            { name: 'Next of Kin', icon: 'fa-user-friends', page: 'nextofkin' },
+            { name: 'Messages', icon: 'fa-comments', page: 'messages' }
+        ],
+        nextofkin: [
+            { name: 'Dashboard', icon: 'fa-chart-pie', page: 'dashboard' },
+            { name: 'Tenant Details', icon: 'fa-user', page: 'tenant-details' },
+            { name: 'Payments', icon: 'fa-credit-card', page: 'payments' },
+            { name: 'Messages', icon: 'fa-comments', page: 'messages' }
+        ]
+    };
+    
+    // ========== EXPANDED MOCK DATA ==========
+    // 15 Tenants
+    const mockTenants = [
+        { id: 1, name: 'Mrs kabasemeza Resty', phone: '+256 756241739', unit: 'A101', rent: 350000, nextOfKin: 'Mukasa Maria', kinPhone: '+256 702 345678' },
+        { id: 2, name: 'Mr Okuonzi Alfred', phone: '+256 780569225', unit: 'B203', rent: 400000, nextOfKin: 'Nakato Paul', kinPhone: '+256 704 567890' },
+        { id: 3, name: 'Mrs Akello Brenda', phone: '+256 705 678901', unit: 'C305', rent: 300000, nextOfKin: 'Okello Grace', kinPhone: '+256 706 789012' },
+        { id: 4, name: 'Mrs Kemigabo Rebecca', phone: '+256 707 890123', unit: 'D402', rent: 450000, nextOfKin: 'Namugga Robert', kinPhone: '+256 708 901234' },
+        { id: 5, name: 'Mr Ssegawa Musa', phone: '+256 709 012345', unit: 'E101', rent: 380000, nextOfKin: 'Nakato Grace', kinPhone: '+256 710 123456' },
+        { id: 6, name: 'Ms Nantume Florence', phone: '+256 711 234567', unit: 'F202', rent: 420000, nextOfKin: 'Ssali Godfrey', kinPhone: '+256 712 345678' },
+        { id: 7, name: 'Dr. Olupot Peter', phone: '+256 713 456789', unit: 'G303', rent: 500000, nextOfKin: 'Auma Rose', kinPhone: '+256 714 567890' },
+        { id: 8, name: 'Mrs Amongin Betty', phone: '+256 715 678901', unit: 'H404', rent: 370000, nextOfKin: 'Odongo James', kinPhone: '+256 716 789012' },
+        { id: 9, name: 'Mr Mwebaze Charles', phone: '+256 717 890123', unit: 'I505', rent: 430000, nextOfKin: 'Nassali Prossy', kinPhone: '+256 718 901234' },
+        { id: 10, name: 'Ms Nakanwagi Alice', phone: '+256 719 012345', unit: 'J606', rent: 390000, nextOfKin: 'Kizito Henry', kinPhone: '+256 720 123456' },
+        { id: 11, name: 'Mr Mugisha Robert', phone: '+256 721 234567', unit: 'K707', rent: 460000, nextOfKin: 'Uwimana Grace', kinPhone: '+256 722 345678' },
+        { id: 12, name: 'Mrs Kyomugisha Patience', phone: '+256 723 456789', unit: 'L808', rent: 410000, nextOfKin: 'Tumusiime Dan', kinPhone: '+256 724 567890' },
+        { id: 13, name: 'Mr Byaruhanga Andrew', phone: '+256 725 678901', unit: 'M909', rent: 440000, nextOfKin: 'Komugisha Joy', kinPhone: '+256 726 789012' },
+        { id: 14, name: 'Ms Nakato Christine', phone: '+256 727 890123', unit: 'N010', rent: 360000, nextOfKin: 'Lubega Frank', kinPhone: '+256 728 901234' },
+        { id: 15, name: 'Mr Wasswa Salim', phone: '+256 729 012345', unit: 'O111', rent: 480000, nextOfKin: 'Nabatanzi Aisha', kinPhone: '+256 730 123456' }
+    ];
+
+    // 30 Electricity Bills (consumers)
+    const mockElectricityBills = [];
+    for (let i = 0; i < 30; i++) {
+        const tenantObj = i < mockTenants.length ? mockTenants[i] : mockTenants[i % mockTenants.length];
+        const consumptionBase = 80 + Math.floor(Math.random() * 120); // 80-200 kWh
+        const amount = consumptionBase * 600; // UGX 600 per kWh
+        const months = ['January 2024', 'February 2024', 'March 2024'];
+        const month = months[i % 3];
+        const status = i % 3 === 0 ? 'paid' : (i % 3 === 1 ? 'pending' : 'paid'); // mix
+        
+        mockElectricityBills.push({
+            id: i+1,
+            tenant: tenantObj.name,
+            unit: tenantObj.unit + (i >= mockTenants.length ? '-B' : ''),
+            consumption: consumptionBase,
+            amount: amount,
+            month: month,
+            status: status
+        });
+    }
+
+    // Rent payments for 15 tenants
+    const mockRentPayments = mockTenants.map((t, index) => ({
+        id: index+1,
+        tenant: t.name,
+        unit: t.unit,
+        amount: t.rent,
+        date: `2024-01-${10 + (index % 20)}`,
+        status: index % 4 === 0 ? 'paid' : (index % 4 === 1 ? 'pending' : (index % 4 === 2 ? 'paid' : 'overdue'))
+    }));
+
+    // Messages
+    const mockMessages = [
+        { id: 1, from: 'Mr Okuonzi Alfred', subject: 'Plumbing Issue', message: 'The bathroom sink is leaking', date: '2024-01-20', status: 'unread' },
+        { id: 2, from: 'Mrs Akello Brenda', subject: 'Rent Payment', message: 'I have paid the rent for January', date: '2024-01-19', status: 'read' },
+        { id: 3, from: 'Mrs Kemigabo Rebecca', subject: 'Electricity Bill', message: 'The bill seems too high', date: '2024-01-18', status: 'unread' },
+        { id: 4, from: 'Mr Ssegawa Musa', subject: 'Maintenance', message: 'Gate remote not working', date: '2024-01-22', status: 'unread' },
+        { id: 5, from: 'Ms Nantume Florence', subject: 'Noise complaint', message: 'Loud music from neighbor', date: '2024-01-21', status: 'read' }
+    ];
+    
+    const monthlyStats = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        collections: [4500000, 4800000, 5000000, 4700000, 5200000, 5100000],
+        pending: [500000, 300000, 600000, 400000, 200000, 300000]
+    };
+    
+    // Initialize the application
+    function init() {
+        // Set up login tabs
+        showLogin('admin');
+        
+        // Add event listeners
+        window.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const profileBtn = event.target.closest('#profileDropdown button');
+            
+            if (!profileBtn && dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Show login tab
+    function showLogin(role) {
+        // Update tab styles
+        ['admin', 'tenant', 'nextofkin'].forEach(r => {
+            const btn = document.getElementById(`${r}TabBtn`);
+            if (r === role) {
+                btn.className = 'flex-1 py-2 px-4 text-center border-b-2 border-jamaica-green font-medium text-jamaica-green';
+            } else {
+                btn.className = 'flex-1 py-2 px-4 text-center border-b-2 border-transparent font-medium text-gray-500 hover:text-jamaica-green';
+            }
+        });
+    }
+    
+    // Handle login
+    function handleLogin(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        // Simple mock authentication
+        if (email.includes('tenant')) {
+            currentUser = { name: 'Mukasa John', role: 'tenant', email: email };
+        } else if (email.includes('kin')) {
+            currentUser = { name: 'Mukasa Maria', role: 'nextofkin', email: email };
+        } else {
+            currentUser = { name: 'Admin User', role: 'admin', email: email };
+        }
+        
+        userRole = currentUser.role;
+        
+        // Show dashboard
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('dashboardPage').classList.remove('hidden');
+        
+        // Update user info
+        document.getElementById('userInitials').textContent = currentUser.name.split(' ').map(n => n[0]).join('');
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userRole').textContent = userRole === 'admin' ? 'Administrator' : userRole === 'tenant' ? 'Tenant' : 'Next of Kin';
+        document.getElementById('profileName').textContent = currentUser.name.split(' ')[0];
+        
+        // Load sidebar navigation
+        loadSidebarNav();
+        
+        // Load default page
+        showPage('dashboard');
+    }
+    
+    // Load sidebar navigation
+    function loadSidebarNav() {
+        const sidebar = document.getElementById('sidebarLinks');
+        const links = navLinks[userRole] || [];
+        
+        sidebar.innerHTML = links.map(link => `
+            <button onclick="showPage('${link.page}')" class="sidebar-link w-full text-left flex items-center px-4 py-2 text-gray-600 hover:bg-yellow-100 hover:text-jamaica-green rounded-lg transition duration-200" data-page="${link.page}">
+                <i class="fas ${link.icon} w-6"></i>
+                <span>${link.name}</span>
+            </button>
+        `).join('');
+        
+        // Highlight active link
+        highlightActiveLink(currentPage);
+    }
+    
+    // Highlight active sidebar link
+    function highlightActiveLink(page) {
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            if (link.dataset.page === page) {
+                link.classList.add('bg-yellow-100', 'text-jamaica-green');
+            } else {
+                link.classList.remove('bg-yellow-100', 'text-jamaica-green');
+            }
+        });
+    }
+    
+    // Show different pages
+    function showPage(page) {
+        currentPage = page;
+        highlightActiveLink(page);
+        
+        const content = document.getElementById('pageContent');
+        const pageTitle = document.getElementById('pageTitle');
+        
+        // Update page title
+        const link = navLinks[userRole]?.find(l => l.page === page);
+        pageTitle.textContent = link ? link.name : 'Dashboard';
+        
+        // Load appropriate content
+        switch(page) {
+            case 'dashboard':
+                loadDashboard(content);
+                break;
+            case 'rent':
+            case 'my-rent':
+                loadRentPage(content);
+                break;
+            case 'electricity':
+            case 'my-bills':
+                loadElectricityPage(content);
+                break;
+            case 'tenants':
+                loadTenantsPage(content);
+                break;
+            case 'messages':
+                loadMessagesPage(content);
+                break;
+            case 'profile':
+                loadProfilePage(content);
+                break;
+            case 'nextofkin':
+                loadNextOfKinPage(content);
+                break;
+            default:
+                loadDashboard(content);
+        }
+    }
+    
+    // Load Dashboard
+    function loadDashboard(container) {
+        const stats = {
+            totalRent: 4250000,
+            pendingBills: 178000,
+            totalTenants: 15,
+            occupancyRate: 95
+        };
+        
+        let html = `
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-jamaica-green">Welcome back, ${currentUser.name}!</h2>
+                <p class="text-jamaica-black/70">Keyholder vibes & property insights.</p>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        `;
+        
+        const statCards = [
+            { label: 'Total Rent Collected', value: `UGX ${stats.totalRent.toLocaleString()}`, icon: 'fa-money-bill-wave', color: 'bg-jamaica-green' },
+            { label: 'Pending Bills', value: `UGX ${stats.pendingBills.toLocaleString()}`, icon: 'fa-clock', color: 'bg-jamaica-yellow text-jamaica-black' },
+            { label: 'Active Tenants', value: stats.totalTenants, icon: 'fa-users', color: 'bg-jamaica-green' },
+            { label: 'Occupancy Rate', value: `${stats.occupancyRate}%`, icon: 'fa-chart-line', color: 'bg-jamaica-yellow text-jamaica-black' }
+        ];
+        
+        statCards.forEach(card => {
+            html += `
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 hover-scale border border-jamaica-green/30">
+                    <div class="flex items-center">
+                        <div class="${card.color} w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl ${card.color.includes('yellow') ? 'text-jamaica-black' : 'text-white'}">
+                            <i class="fas ${card.icon}"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">${card.label}</p>
+                            <p class="text-2xl font-semibold text-gray-800">${card.value}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                    <h3 class="text-lg font-semibold text-jamaica-green mb-4">Rent Collection Trend</h3>
+                    <canvas id="rentChart" class="w-full h-64"></canvas>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                    <h3 class="text-lg font-semibold text-jamaica-green mb-4">Recent Payments</h3>
+                    <div class="overflow-y-auto max-h-80">
+        `;
+        
+        mockRentPayments.slice(0, 5).forEach(payment => {
+            const statusColor = payment.status === 'paid' ? 'text-green-800 bg-green-100' : 
+                               payment.status === 'pending' ? 'text-yellow-800 bg-yellow-100' : 'text-red-800 bg-red-100';
+            
+            html += `
+                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                    <div>
+                        <p class="font-medium text-gray-800">${payment.tenant}</p>
+                        <p class="text-sm text-gray-500">Unit ${payment.unit}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-gray-800">UGX ${payment.amount.toLocaleString()}</p>
+                        <span class="text-xs px-2 py-1 rounded-full ${statusColor}">${payment.status}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Messages -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-jamaica-green">Recent Messages</h3>
+                    <button onclick="showPage('messages')" class="text-jamaica-green hover:text-jamaica-green/80 text-sm">View All</button>
+                </div>
+                <div class="space-y-4">
+        `;
+        
+        mockMessages.slice(0, 3).forEach(msg => {
+            html += `
+                <div class="flex items-start space-x-3 p-3 hover:bg-yellow-50 rounded-lg transition duration-200">
+                    <div class="w-10 h-10 bg-jamaica-green/20 rounded-full flex items-center justify-center text-jamaica-green">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <p class="font-medium text-gray-800">${msg.from}</p>
+                            <p class="text-xs text-gray-500">${msg.date}</p>
+                        </div>
+                        <p class="text-sm font-medium text-gray-700">${msg.subject}</p>
+                        <p class="text-sm text-gray-500">${msg.message.substring(0, 60)}...</p>
+                    </div>
+                    ${msg.status === 'unread' ? '<span class="w-2 h-2 bg-jamaica-green rounded-full"></span>' : ''}
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Initialize chart
+        setTimeout(() => {
+            const ctx = document.getElementById('rentChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyStats.labels,
+                        datasets: [{
+                            label: 'Collected (UGX)',
+                            data: monthlyStats.collections,
+                            borderColor: '#009B3A',
+                            backgroundColor: 'rgba(0,155,58,0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Pending (UGX)',
+                            data: monthlyStats.pending,
+                            borderColor: '#FFD100',
+                            backgroundColor: 'rgba(255,209,0,0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }, 100);
+    }
+    
+    // Load Rent Management Page
+    function loadRentPage(container) {
+        let html = `
+            <div class="mb-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-semibold text-jamaica-green">Rent Management (15 Tenants)</h2>
+                    <p class="text-jamaica-black/70">Track and manage all rent payments</p>
+                </div>
+                <button onclick="showAddPaymentModal()" class="bg-jamaica-green text-white px-4 py-2 rounded-lg hover:bg-jamaica-green/80 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>Record Payment
+                </button>
+            </div>
+            
+            <!-- Filters -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-4 mb-6 border border-jamaica-green/30">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <input type="text" placeholder="Tenant or Unit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green">
+                            <option>All</option>
+                            <option>Paid</option>
+                            <option>Pending</option>
+                            <option>Overdue</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                        <input type="month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green">
+                    </div>
+                    <div class="flex items-end">
+                        <button class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition duration-200">
+                            <i class="fas fa-filter mr-2"></i>Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-green-50 rounded-xl p-6 border-l-4 border-jamaica-green">
+                    <p class="text-sm text-jamaica-green font-medium">Total Collected</p>
+                    <p class="text-2xl font-bold text-gray-800">UGX 5,250,000</p>
+                    <p class="text-xs text-gray-500 mt-1">This month</p>
+                </div>
+                <div class="bg-yellow-50 rounded-xl p-6 border-l-4 border-jamaica-yellow">
+                    <p class="text-sm text-yellow-700 font-medium">Pending Collection</p>
+                    <p class="text-2xl font-bold text-gray-800">UGX 1,550,000</p>
+                    <p class="text-xs text-gray-500 mt-1">From 8 tenants</p>
+                </div>
+                <div class="bg-red-50 rounded-xl p-6 border-l-4 border-red-500">
+                    <p class="text-sm text-red-600 font-medium">Overdue</p>
+                    <p class="text-2xl font-bold text-gray-800">UGX 680,000</p>
+                    <p class="text-xs text-gray-500 mt-1">4 tenants overdue</p>
+                </div>
+            </div>
+            
+            <!-- Payments Table -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden border border-jamaica-green/30">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-jamaica-green/10">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Tenant</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Unit</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Payment Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Month</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+        `;
+        
+        mockRentPayments.forEach(payment => {
+            const statusColor = payment.status === 'paid' ? 'bg-green-100 text-green-800' : 
+                               payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+            
+            html += `
+                <tr class="hover:bg-yellow-50/50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${payment.tenant}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${payment.unit}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">UGX ${payment.amount.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${payment.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">January 2024</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full ${statusColor}">${payment.status}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button onclick="editPayment(${payment.id})" class="text-jamaica-green hover:text-jamaica-green/80 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="viewReceipt(${payment.id})" class="text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-gray-700">Showing 1 to 15 of 15 results</p>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">Previous</button>
+                            <button class="px-3 py-1 bg-jamaica-green text-white rounded-md text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    // Load Electricity Bills Page (with 30 consumers)
+    function loadElectricityPage(container) {
+        let html = `
+            <div class="mb-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-semibold text-jamaica-green">Electricity Bills (30 Consumers)</h2>
+                    <p class="text-jamaica-black/70">Manage and track electricity consumption</p>
+                </div>
+                <button onclick="showAddBillModal()" class="bg-jamaica-green text-white px-4 py-2 rounded-lg hover:bg-jamaica-green/80 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>Generate Bills
+                </button>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                    <p class="text-sm text-gray-500 mb-1">Total Consumption</p>
+                    <p class="text-2xl font-bold text-gray-800">4,120 kWh</p>
+                    <p class="text-xs text-green-600 mt-1">↑ 9% from last month</p>
+                </div>
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                    <p class="text-sm text-gray-500 mb-1">Total Amount</p>
+                    <p class="text-2xl font-bold text-gray-800">UGX 2,472,000</p>
+                    <p class="text-xs text-gray-500 mt-1">For multiple months</p>
+                </div>
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                    <p class="text-sm text-gray-500 mb-1">Paid</p>
+                    <p class="text-2xl font-bold text-gray-800">UGX 1,350,000</p>
+                    <p class="text-xs text-green-600 mt-1">55% collected</p>
+                </div>
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                    <p class="text-sm text-gray-500 mb-1">Pending</p>
+                    <p class="text-2xl font-bold text-gray-800">UGX 1,122,000</p>
+                    <p class="text-xs text-yellow-600 mt-1">Due in 7 days</p>
+                </div>
+            </div>
+            
+            <!-- Bills Table -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden border border-jamaica-green/30">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-jamaica-green/10">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Tenant</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Unit</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Month</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Consumption</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Rate/kWh</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-jamaica-green uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+        `;
+        
+        mockElectricityBills.slice(0, 30).forEach(bill => {
+            const statusColor = bill.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+            
+            html += `
+                <tr class="hover:bg-yellow-50/50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${bill.tenant}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${bill.unit}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${bill.month}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${bill.consumption} kWh</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">UGX 600</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">UGX ${bill.amount.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full ${statusColor}">${bill.status}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button onclick="downloadBill(${bill.id})" class="text-jamaica-green hover:text-jamaica-green/80 mr-3">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button onclick="markBillAsPaid(${bill.id})" class="text-green-600 hover:text-green-900">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 text-sm text-jamaica-green bg-yellow-50">Showing 30 electricity consumers (expanded dataset)</div>
+            </div>
+            
+            <!-- Meter Readings Form -->
+            <div class="mt-8 bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-6 border border-jamaica-green/30">
+                <h3 class="text-lg font-semibold text-jamaica-green mb-4">Record Meter Readings</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Unit</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green">
+                            <option>Unit A101 - Mukasa John</option>
+                            <option>Unit B203 - Nakato Sarah</option>
+                            <option>Unit C305 - Okello Peter</option>
+                            <option>Unit D402 - Namugga Alice</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Previous Reading</label>
+                        <input type="number" value="1250" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Reading</label>
+                        <input type="number" placeholder="Enter current reading" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green">
+                    </div>
+                </div>
+                <button class="mt-4 bg-jamaica-green text-white px-6 py-2 rounded-lg hover:bg-jamaica-green/80 transition duration-200">
+                    <i class="fas fa-calculator mr-2"></i>Calculate Bill
+                </button>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    // Load Tenants Page (with 15 tenants)
+    function loadTenantsPage(container) {
+        let html = `
+            <div class="mb-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-semibold text-jamaica-green">Tenants Management (15)</h2>
+                    <p class="text-jamaica-black/70">Manage tenant information and next of kin</p>
+                </div>
+                <button onclick="showAddTenantModal()" class="bg-jamaica-green text-white px-4 py-2 rounded-lg hover:bg-jamaica-green/80 transition duration-200">
+                    <i class="fas fa-user-plus mr-2"></i>Add Tenant
+                </button>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md p-4 mb-6 border border-jamaica-green/30">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <input type="text" placeholder="Search tenants by name, unit, or phone..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-jamaica-green">
+                    </div>
+                    <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition duration-200">
+                        <i class="fas fa-search mr-2"></i>Search
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tenants Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        `;
+        
+        mockTenants.forEach(tenant => {
+            html += `
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden hover-scale border border-jamaica-green/30">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-jamaica-green/20 rounded-full flex items-center justify-center text-jamaica-green text-xl font-bold">
+                                ${tenant.name.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800">${tenant.name}</h3>
+                                <p class="text-sm text-gray-500">Unit ${tenant.unit}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <p class="text-sm flex items-center text-gray-600">
+                                <i class="fas fa-phone w-5 text-jamaica-green"></i>
+                                ${tenant.phone}
+                            </p>
+                            <p class="text-sm flex items-center text-gray-600">
+                                <i class="fas fa-money-bill-wave w-5 text-jamaica-green"></i>
+                                UGX ${tenant.rent.toLocaleString()}/month
+                            </p>
+                            <div class="pt-2 mt-2 border-t border-gray-100">
+                                <p class="text-xs text-gray-500 mb-1">Next of Kin</p>
+                                <p class="text-sm font-medium text-gray-800">${tenant.nextOfKin}</p>
+                                <p class="text-xs text-gray-500">${tenant.kinPhone}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex justify-end space-x-2">
+                            <button onclick="editTenant(${tenant.id})" class="text-jamaica-green hover:text-jamaica-green/80">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="viewTenantDetails(${tenant.id})" class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    // Messages page (shortened for brevity, but reuse)
+    function loadMessagesPage(container) {
+        let html = `
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-jamaica-green">Messages</h2>
+                <p class="text-jamaica-black/70">Communicate with tenants and next of kin</p>
+            </div>
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden border border-jamaica-green/30">
+                <div class="p-4">(Messages similar, with 5+ conversations)</div>
+            </div>
+        `;
+        container.innerHTML = html;
+    }
+    
+    function loadProfilePage(container) { 
+        container.innerHTML = `<div class="text-jamaica-green p-8">Profile page (Jamaican colours)</div>`;
+    }
+    function loadNextOfKinPage(container) { 
+        container.innerHTML = `<div class="text-jamaica-green p-8">Next of Kin overview</div>`;
+    }
+    
+    // Utility Functions
+    function toggleMobileMenu() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+    }
+    function toggleProfileDropdown() {
+        document.getElementById('dropdownMenu').classList.toggle('hidden');
+    }
+    function handleLogout() {
+        currentUser = null;
+        document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('dashboardPage').classList.add('hidden');
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+    }
+    function showAddPaymentModal() { alert('Add Payment Modal (Jamaica style)'); }
+    function showAddBillModal() { alert('Generate 30 Bills?'); }
+    function showAddTenantModal() { alert('Add Tenant'); }
+    function editPayment(id) { alert(`Edit payment ${id}`); }
+    function viewReceipt(id) { alert(`Receipt ${id}`); }
+    function editTenant(id) { alert(`Edit tenant ${id}`); }
+    function viewTenantDetails(id) { alert(`Details ${id}`); }
+    function downloadBill(id) { alert(`Download bill ${id}`); }
+    function markBillAsPaid(id) { alert(`Mark bill ${id} paid`); }
+    
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
